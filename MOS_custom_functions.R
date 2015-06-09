@@ -938,6 +938,7 @@ make_inputs <- function(variable_config_list,
                         variables_to_drop = NA,
                         append_name,
                         facet_as_dropdown = FALSE) {
+    browser()
     # index which variables are slider candidates
     slider_index <- unlist(lapply(variable_config_list, 
                                   function(x) x$slider_candidate == TRUE))

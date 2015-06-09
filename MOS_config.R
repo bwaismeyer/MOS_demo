@@ -2,7 +2,8 @@
 # Contact: bwaismeyer@gmail.com
 
 # Date created: 5/12/2015
-# Date updated: 6/5/2015
+# Date instance created: 6/6/2015
+# Date updated: 6/9/2015
 
 ###############################################################################
 ## SCRIPT OVERVIEW
@@ -31,7 +32,10 @@
 #
 #       Non-functional example code has been provided in each configuration
 #       section. A working example project with code can be observed here:
-#       ##UPDATE NEEDED##
+#       https://github.com/bwaismeyer/MOS_demo
+#
+#       You can see the example project in action here:
+#       ## UPDATE NEEDED ##
 #
 # SCRIPT OUTLINE:
 # - Name the Application Instance
@@ -94,26 +98,65 @@
 ###############################################################################
 ## Name the Application Instance
 
-MOS_instance_name <- "Exploring Cat Huggability"
+MOS_instance_name <- "Simulating Wine Quality Test Results"
 
 ###############################################################################
 ## Import and Name the Data Object as Needed
 
-base_data <- read.csv("how_huggable_is_that_cat.csv")
+# the red and white datasets both come as CSVs with semi-colon used as the
+# separator
+red_URL <- paste0("http://archive.ics.uci.edu/ml/machine-learning-databases/",
+                  "wine-quality/winequality-red.csv")
+white_URL <- paste0("http://archive.ics.uci.edu/ml/machine-learning-databases/",
+                    "wine-quality/winequality-white.csv")
+
+# we read in the data
+red <- read.table(red_URL, header = TRUE, sep = ";", 
+                  stringsAsFactors = FALSE)
+white <- read.table(white_URL, header = TRUE, sep = ";", 
+                    stringsAsFactors = FALSE)
+
+# we add a new column to each to indicate the wine type
+red$type <- "red"
+white$type <- "white"
+
+# we merge into a single dataset
+wine <- rbind(red, white)
+
+# we create a multinomial outcome variable
+wine$quality_group[wine$quality <= 4] <- "Poor"
+wine$quality_group[wine$quality == 5] <- "Acceptable"
+wine$quality_group[wine$quality == 6] <- "Good"
+wine$quality_group[wine$quality > 6] <- "Very Good"
+
+# we convert the character vectors to proper factors
+wine$type <- factor(wine$type, 
+                    levels = c("red", "white"),
+                    labels = c("Red", "White"))
+wine$quality_group <- factor(wine$quality_group,
+                             levels = c("Poor", "Acceptable", 
+                                        "Good", "Very Good"))
+
+# we retain only the numerical coefficients with a correlation coefficent
+# greater than 0.10, our categorial coefficient, and our outcome
+wine <- dplyr::select(wine, volatile.acidity, chlorides, density, alcohol, 
+                      type, quality_group)
+
+# specify the base_data file
+base_data <- wine
 
 ###############################################################################
 ## Specify the Multinomial Logit Formula
 
 # Note that the formula needs to correctly reference the base_data object
 # column names.
-base_formula <-
-    # outcome column
-    huggable_or_not ~ 
+base_formula <- 
+    # outcome
+    quality_group ~ 
     # additive terms
-    eye_size + whisker_length + claw_sharpness + color + cuddles_per_min +
-    objects_broken + gender +
+    volatile.acidity + chlorides + density + alcohol + type
     # interaction terms
-    claw_sharpness : cuddles_per_min
+    # none for this demo but you can define them with either * or :
 
 ###############################################################################
 ## Variable Configuration
@@ -159,28 +202,61 @@ base_formula <-
 # )
 
 variable_configuration <- list(   
-    whisker_length = list(
-        pretty_name         = "Whisker Length (Inches)",
-        definition          = paste0("A measurement of the cat's mean whisker ",
-                                     "length from skin to whisker tip."),
-        ribbon_plot_summary = paste0("As whisker length increases, the ",
-                                     "simulated likelihood of the kitty being ",
-                                     "huggable also increases."),
+    volatile.acidity = list(
+        pretty_name         = "Volatile Acidity",
+        definition          = paste0("Steam distillable acids present in ",
+                                     "wine."),
+        ribbon_plot_summary = paste0(),
         custom_x_axis_ticks = NULL,
         x_axis_candidate    = TRUE,
         slider_candidate    = TRUE,
-        slider_rounding     = 1,
+        slider_rounding     = NA,
         facet_candidate     = FALSE,
         transform_for_ui    = identity,
         transform_for_model = identity
-    ),    
-    gender = list(
-        pretty_name         = paste0("Cat Gender"),
-        definition          = paste0("A description of the cat's apparent ",
-                                     "biological sex."),
-        ribbon_plot_summary = paste0(""),
+    ),
+    chlorides = list(
+        pretty_name         = "Chlorides",
+        definition          = paste0("Amount of salt in the wine."),
+        ribbon_plot_summary = paste0(),
         custom_x_axis_ticks = NULL,
-        x_axis_candidate    = FALSE,    
+        x_axis_candidate    = TRUE,
+        slider_candidate    = TRUE,
+        slider_rounding     = NA,
+        facet_candidate     = FALSE,
+        transform_for_ui    = identity,
+        transform_for_model = identity
+    ),
+    density = list(
+        pretty_name         = "Density",
+        definition          = paste0("Grams per cubic centimeter."),
+        ribbon_plot_summary = paste0(),
+        custom_x_axis_ticks = NULL,
+        x_axis_candidate    = TRUE,
+        slider_candidate    = TRUE,
+        slider_rounding     = NA,
+        facet_candidate     = FALSE,
+        transform_for_ui    = identity,
+        transform_for_model = identity
+    ),
+    alcohol = list(
+        pretty_name         = "Alcohol",
+        definition          = paste0("Percent alcohol content."),
+        ribbon_plot_summary = paste0(),
+        custom_x_axis_ticks = NULL,
+        x_axis_candidate    = TRUE,
+        slider_candidate    = TRUE,
+        slider_rounding     = NA,
+        facet_candidate     = FALSE,
+        transform_for_ui    = identity,
+        transform_for_model = identity
+    ),
+    type = list(
+        pretty_name         = "Type of Wine",
+        definition          = paste0("Red or White."),
+        ribbon_plot_summary = paste0(),
+        custom_x_axis_ticks = NULL,
+        x_axis_candidate    = FALSE,
         slider_candidate    = FALSE,
         slider_rounding     = NA,
         facet_candidate     = TRUE,
@@ -195,18 +271,17 @@ variable_configuration <- list(
 # Colors are applied in the order they are given to outcomes in level order
 # (e.g., first outcome level is paired with the first color, etc.).
 # If no custom colors are desired, set this to NULL.
-custom_outcome_colors <- c("#D9BB32", "#6DB33F")
+custom_outcome_colors <- NULL
 
 ###############################################################################
 ## Custom bootstrap.css (Optional)
 
 # Custom bootstrap.css file must be in the www subdirectory of the MOS
 # application. Set "custom_css" to NULL if you don't want to use one.
-custom_css = "bootstrap.css"
+custom_css = NULL
 
-# NOTE: This CSS example theme was provided by the nifty bootswatch.com here:
-# https://bootswatch.com/sandstone/
-# Check them out for other pre-made boostrap files.
+# NOTE:
+# Check out bootswatch.com for some nice, simple premade bootstrap files.
 
 ###############################################################################
 ## Ribbon Plot Addendum (Optional)
@@ -219,13 +294,7 @@ ribbon_addendum <-
     paste0("<br><strong>Please Keep In Mind</strong>",
            
            "<br>This simulation cannot tell if the observed relationships are",
-           "causal or correlational.",
-           
-           "<br><br><strong>What Is This Simulation Based On?</strong>",
-           
-           "<br>The simulation is modeled on real data: a survey of 32 cats ",
-           "conducted by a trained researcher. The survey was conducted in ",
-           "a suburb in Seattle, WA.")
+           "causal or correlational.")
 
 ###############################################################################
 ## Dot Cloud Plot Addendum (Optional)
@@ -238,26 +307,26 @@ ribbon_addendum <-
 dot_cloud_addendum <- 
     paste0("<strong>What Does This Tool Do?</strong>",
            
-           "<br>This tool allows you to describe a specific cat ",
-           "observe how likely each outcome is for simulations based ",
-           "on that cat description.", 
+           "<br>This tool allows you to describe a specific wine and ",
+           "observe how likely each quality outcome is for simulations based ",
+           "on that wine description.", 
            
-           "<br><br>You describe the cat by setting the inputs to the values ",
-           "that best fit it.",
+           "<br><br>You describe the wine by setting the inputs to the ",
+           "values that best fit it.",
            
-           "<br><br>Each time the 'SIMULATE' button is clicked, the cat ",
+           "<br><br>Each time the 'SIMULATE' button is clicked, the wine ",
            "you described is run through 1000 versions of our ",
-           "cat huggability model. These versions vary based on how much ",
+           "quality assessment model. These versions vary based on how much ",
            "uncertainty there is in the model.",
            
            "<br><br>For each model version, we get an estimate of how likely ",
-           "the outcomes are. We plot every estimate by its outcome.",
+           "the quality outcomes are. We plot every estimate by its outcome.",
            
            "<br><br>The resulting plot gives us a sense of how likely the ",
            "outcomes tend to be across all the model versions (where do the ",
            "dots tend to cluster for each outcome?) while also suggesting ",
            "how much confidence we should have in our model's ability to ", 
-           "accurately simulate outcomes for the described cat ",
+           "accurately simulate outcomes for the described wine ",
            "(how spread out are the dots for each outcome?)")
 
 ###############################################################################
@@ -277,14 +346,8 @@ more_info_title <- "What is the simulation based on?"
 # You will need to reference and adjust the ui.R and server.R scripts if you 
 # want more complex Shiny R features here.
 more_info_body <- 
-    paste0("The simulation is modeled on real data: a survey of 32 cats ",
-           "conducted by a trained researcher. The survey was conducted in ",
-           "a suburb in Seattle, WA.")
-
-
-###############################################################################
-## END OF SCRIPT
-###############################################################################
+    paste0("See the detailed description ",
+           "<a href='http://archive.ics.uci.edu/ml/datasets/Wine+Quality'>here</a>.")
 
 ###############################################################################
 ## END OF SCRIPT
