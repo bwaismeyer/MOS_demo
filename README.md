@@ -13,6 +13,7 @@ A detailed description of the MOS - along with the files needed to construct an
 MOS instance - are available at the [MOS GitHub repository](https://github.com/bwaismeyer/MOS_framework).
 
 To create an MOS instance, you need three things:
+
 1. a dataset with at least one multinomial outcome
 2. a multinomial model formula for that dataset
 3. an `MOS_config.R` file tailored to the model, data, and your audience
