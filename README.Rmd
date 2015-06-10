@@ -1,5 +1,5 @@
 ---
-title: 'MOS Demo: Simulating TA Evaluations'
+title: 'MOS Demo: Simulating Wine Qaulity Assessments'
 author: "Brian Waismeyer"
 date: "June 5, 2015"
 output: 
@@ -12,6 +12,9 @@ output:
 This project is a simple demonstration of what a functional Multinomial
 Outcome Simulator (MOS) instance looks like. 
 
+You can see the demo in action 
+[via AWS](http://ec2-52-26-165-185.us-west-2.compute.amazonaws.com:3939/MOS_demo/).
+
 ## What is the Multinomial Outcome Simulator (MOS) framework?
 The MOS framework is a configurable R and Shiny application for exploring 
 multinomial models through simulation and visualization.
@@ -19,11 +22,13 @@ multinomial models through simulation and visualization.
 A detailed description of the MOS - along with the files needed to construct an
 MOS instance - are available at the [MOS GitHub repository](https://github.com/bwaismeyer/MOS_framework).
 
-To create an MOS instance, you need three things:
+To create an MOS instance, you need four things:
 
 1. a dataset with at least one multinomial outcome
 2. a multinomial model formula for that dataset
-3. an `MOS_config.R` file tailored to the model, data, and your audience
+3. the [MOS framework files](https://github.com/bwaismeyer/MOS_framework)
+3. the `MOS_config.R` file tailored to the model, data, and your audience (a 
+rough, unconfigured version of this file comes with the MOS framework files)
 
 ## What is the point of this document and who is it written for?
 This document overviews the the process of going from data to a configured MOS 
