@@ -62,7 +62,7 @@ My goal is not to demonstrate how to choose a model or even how to fit a model
 well - my goal is to show the user how to take a given multinomial model and
 its dataset and create an MOS instance.
 
-To this end, I chose the [Wine Qaulity Dataset](http://archive.ics.uci.edu/ml/datasets/Wine+Quality)
+To this end, I chose the [Wine Quality Dataset](http://archive.ics.uci.edu/ml/datasets/Wine+Quality)
 available for free from the [UCI Machine Learning Repository](http://archive.ics.uci.edu/ml/about.html).
 
 The dataset is a collection of measurements for red and white wines coupled
@@ -216,7 +216,7 @@ you can use the `shinythemes` package to use some premade boostrap variants
 by editing the `ui.R` file directly (the MOS intance will use the 
 ['united'](https://bootswatch.com/united/) theme by default).
 
-Check out the demo [`MOS_config.R`](https://github.com/bwaismeyer/MOS_framework/blob/MOS_demo/MOS_config.R) 
+Check out the demo [`MOS_config.R`](https://github.com/bwaismeyer/MOS_demo/blob/master/MOS_config.R) 
 file to see an example of a fully specified config file.
 
 ## Installing the supporting packages locally

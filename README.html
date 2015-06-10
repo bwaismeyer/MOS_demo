@@ -133,7 +133,7 @@ img {
 <h2>Selecting and preparing a dataset</h2>
 <p>The internet is rich with free data. However, for this project we want a minimally complex dataset that still meets our modeling needs.</p>
 <p>My goal is not to demonstrate how to choose a model or even how to fit a model well - my goal is to show the user how to take a given multinomial model and its dataset and create an MOS instance.</p>
-<p>To this end, I chose the <a href="http://archive.ics.uci.edu/ml/datasets/Wine+Quality">Wine Qaulity Dataset</a> available for free from the <a href="http://archive.ics.uci.edu/ml/about.html">UCI Machine Learning Repository</a>.</p>
+<p>To this end, I chose the <a href="http://archive.ics.uci.edu/ml/datasets/Wine+Quality">Wine Quality Dataset</a> available for free from the <a href="http://archive.ics.uci.edu/ml/about.html">UCI Machine Learning Repository</a>.</p>
 <p>The dataset is a collection of measurements for red and white wines coupled with a rating of wine quality for each measurement. I merged the red and white wine datasets together (giving us a factor predictor) and converted the outcome variable (a 1-10 measurement of quality) into quality groups.</p>
 <p>The following code was used to obtain and process the dataset for this demo.</p>
 <pre class="r"><code># the red and white datasets both come as CSVs with semi-colon used as the
@@ -266,7 +266,7 @@ test_fit &lt;- nnet::multinom(formula(exp_data), data = exp_data, Hess = T)</cod
 <p>The sections are all clearly documented and example code is provided in the starting <code>MOS_config.R</code> file that you can replace as needed.</p>
 <p>If your data loading/processing requires specific files or resources, you will need to specify those in the appropriate <code>MOS_config.R</code> section and make sure any files that need to be local to the MOS instance are placed in the instance folder.</p>
 <p>If you want to use a custom <code>bootstrap.css</code> file to style your MOS instance, you will need to place the file in the ‘www’ folder of the instance and specify the file in the appropriate <code>MOS_config.R</code> section. Alternatively, you can use the <code>shinythemes</code> package to use some premade boostrap variants by editing the <code>ui.R</code> file directly (the MOS intance will use the <a href="https://bootswatch.com/united/">‘united’</a> theme by default).</p>
-<p>Check out the demo <a href="https://github.com/bwaismeyer/MOS_framework/blob/MOS_demo/MOS_config.R"><code>MOS_config.R</code></a> file to see an example of a fully specified config file.</p>
+<p>Check out the demo <a href="https://github.com/bwaismeyer/MOS_demo/blob/master/MOS_config.R"><code>MOS_config.R</code></a> file to see an example of a fully specified config file.</p>
 </div>
 <div id="installing-the-supporting-packages-locally" class="section level2">
 <h2>Installing the supporting packages locally</h2>
