@@ -501,7 +501,7 @@ play nicely with the default ubuntu account. We also have a pathway for pulling
 up to date versions of our Shiny application(s) to our server.
 
 Now we need to clone our app(s) in our chosen app hosting folder (e.g., 
-```/home/ubuntu/shiny_apps```).
+`/home/ubuntu/shiny_apps`).
 
 Example bash commands for cloning an application:
 ```

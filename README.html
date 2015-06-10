@@ -89,6 +89,8 @@ img {
 <li><a href="#install-and-configure-r-shiny-and-shiny-server">Install and configure R, Shiny, and Shiny Server</a></li>
 <li><a href="#install-and-configure-git">Install and configure Git</a></li>
 <li><a href="#cloning-the-mos-instance">Cloning the MOS instance</a></li>
+<li><a href="#setting-up-mos-instance-dependencies">Setting Up MOS instance dependencies</a></li>
+<li><a href="#initalize-shiny-server-and-get-the-link-to-your-deployed-mos-instance">Initalize Shiny Server and get the link to your deployed MOS instance</a></li>
 <li><a href="#admire-your-mos-instance">Admire your MOS instance</a></li>
 </ul></li>
 <li><a href="#common-errors">Common Errors</a></li>
@@ -397,65 +399,40 @@ mkdir /home/ubuntu/shiny_logs</code></pre></li>
 <div id="cloning-the-mos-instance" class="section level3">
 <h3>Cloning the MOS instance</h3>
 <p>At this point, we have R, Shiny, and Shiny Server installed and configured to play nicely with the default ubuntu account. We also have a pathway for pulling up to date versions of our Shiny application(s) to our server.</p>
-<p>Now we need to clone our app(s) in our chosen app hosting folder (e.g.,</p>
-<pre class="/home/ubuntu/shiny_apps```)."><code>
-Example bash commands for cloning an application:</code></pre>
-<p>cd /home/ubuntu/shiny_apps/ git clone <a href="https://github.com/bwaismeyer/MOS_demo" class="uri">https://github.com/bwaismeyer/MOS_demo</a></p>
-<pre><code>
-### Setting Up MOS instance dependencies
-Once you have cloned the repository for you MOS instance, you need to setup
-all the packages and other supporting files required for the instance to run.
-Setup directions for a particular instance may vary slightly if you have special 
-package requirements (e.g., if you modified the core framework files or needed 
-extra packages for your data loading).
-
-The MOS framework comes ready to use `packrat` to manage its R dependencies.
-All we need to do is clone the project and then start R in the COS application 
-directory. `packrat` will install all of the relevant packages from their 
-binaries (which `packrat` keeps copies of). 
-
-However, the `Cairo` package is special and attempts to install it will fail 
-unless the correct resources are added to our EC2 server.
-
-I THINK the only packages missing from the default EC2 setup are these.</code></pre>
-<p>sudo apt-get install libcairo2-dev sudo apt-get install libxt-dev</p>
-<pre><code>
-Now we initialize R in the MOS instance project folder - `packrat` should 
-automatically try to install all needed packages. Here's some more example
-code:</code></pre>
-<p>cd /home/ubuntu/shiny_apps/MOS_demo R</p>
-<pre><code>
-If `packrat` doesn't initialize:
-
-* First make sure the working directory is correct (```getwd()``` from the R 
-console).
-* Then manually force the update (```packrat::restore()``` from the R console).
-
-If `packrat` has installation errors, you'll need to problem shoot or install 
-those packages manually (e.g., ```install.packages()``` from the R console).
-
-**Exception**: If `packrat` is failing when it tries to download packages, 
-check out the workaround [here](https://github.com/rstudio/packrat/issues/209).
-
-### Initalize Shiny Server and get the link to your deployed MOS instance
-At this point, it's time to initialize Shiny Server and start looking at your 
-Shiny applications. From the putty console, simply use:</code></pre>
-<p>shiny-server</p>
-<pre><code>
-You should see some confirmation dialogue and see that the server is running. 
-
-**Note**: If you get EADDRINUSE errors... try changing the port Shiny is using 
-(e.g., to 3939). Don't forget that you need to add this port to the EC2 inbound 
-security group AND that this changes the link people need to use to reach the 
-app.
-
-The link you're looking for will be a combination of (a) the EC2 server's 
-Public DNS, (b) the Shiny Server port number, and (c) the application 
-subdirectory. It will look something like this:</code></pre>
-<p>[Public DNS]:[Port Number]/subdirectory</p>
-<pre><code>
-An example:</code></pre>
-<p><a href="http://ec2-52-26-165-185.us-west-2.compute.amazonaws.com:3939/MOS_demo/" class="uri">http://ec2-52-26-165-185.us-west-2.compute.amazonaws.com:3939/MOS_demo/</a> ```</p>
+<p>Now we need to clone our app(s) in our chosen app hosting folder (e.g., <code>/home/ubuntu/shiny_apps</code>).</p>
+<p>Example bash commands for cloning an application:</p>
+<pre><code>cd /home/ubuntu/shiny_apps/
+git clone https://github.com/bwaismeyer/MOS_demo</code></pre>
+</div>
+<div id="setting-up-mos-instance-dependencies" class="section level3">
+<h3>Setting Up MOS instance dependencies</h3>
+<p>Once you have cloned the repository for you MOS instance, you need to setup all the packages and other supporting files required for the instance to run. Setup directions for a particular instance may vary slightly if you have special package requirements (e.g., if you modified the core framework files or needed extra packages for your data loading).</p>
+<p>The MOS framework comes ready to use <code>packrat</code> to manage its R dependencies. All we need to do is clone the project and then start R in the COS application directory. <code>packrat</code> will install all of the relevant packages from their binaries (which <code>packrat</code> keeps copies of).</p>
+<p>However, the <code>Cairo</code> package is special and attempts to install it will fail unless the correct resources are added to our EC2 server.</p>
+<p>I THINK the only packages missing from the default EC2 setup are these.</p>
+<pre><code>sudo apt-get install libcairo2-dev
+sudo apt-get install libxt-dev</code></pre>
+<p>Now we initialize R in the MOS instance project folder - <code>packrat</code> should automatically try to install all needed packages. Here’s some more example code:</p>
+<pre><code>cd /home/ubuntu/shiny_apps/MOS_demo
+R</code></pre>
+<p>If <code>packrat</code> doesn’t initialize:</p>
+<ul>
+<li>First make sure the working directory is correct (<code>getwd()</code> from the R console).</li>
+<li>Then manually force the update (<code>packrat::restore()</code> from the R console).</li>
+</ul>
+<p>If <code>packrat</code> has installation errors, you’ll need to problem shoot or install those packages manually (e.g., <code>install.packages()</code> from the R console).</p>
+<p><strong>Exception</strong>: If <code>packrat</code> is failing when it tries to download packages, check out the workaround <a href="https://github.com/rstudio/packrat/issues/209">here</a>.</p>
+</div>
+<div id="initalize-shiny-server-and-get-the-link-to-your-deployed-mos-instance" class="section level3">
+<h3>Initalize Shiny Server and get the link to your deployed MOS instance</h3>
+<p>At this point, it’s time to initialize Shiny Server and start looking at your Shiny applications. From the putty console, simply use:</p>
+<pre><code>shiny-server</code></pre>
+<p>You should see some confirmation dialogue and see that the server is running.</p>
+<p><strong>Note</strong>: If you get EADDRINUSE errors… try changing the port Shiny is using (e.g., to 3939). Don’t forget that you need to add this port to the EC2 inbound security group AND that this changes the link people need to use to reach the app.</p>
+<p>The link you’re looking for will be a combination of (a) the EC2 server’s Public DNS, (b) the Shiny Server port number, and (c) the application subdirectory. It will look something like this:</p>
+<pre><code>[Public DNS]:[Port Number]/subdirectory</code></pre>
+<p>An example:</p>
+<pre><code>http://ec2-52-26-165-185.us-west-2.compute.amazonaws.com:3939/MOS_demo/</code></pre>
 <p>If the app of interest is in a sub-directory (most likely), then it may be easiest to simply visit the base link (<a href="DNS:Port" class="uri">DNS:Port</a> Number) and click through the auto-generated index to get the full link to your app.</p>
 </div>
 <div id="admire-your-mos-instance" class="section level3">
