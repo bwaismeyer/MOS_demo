@@ -20,7 +20,7 @@ The MOS framework is a configurable R and Shiny application for exploring
 multinomial models through simulation and visualization.
 
 A detailed description of the MOS - along with the files needed to construct an
-MOS instance - are available at the [MOS GitHub repository](https://github.com/bwaismeyer/MOS_framework).
+MOS instance - are available at the [MOS framework GitHub repository](https://github.com/bwaismeyer/MOS_framework).
 
 To create an MOS instance, you need four things:
 
@@ -54,7 +54,7 @@ R, Shiny, or multinomial analysis are unfamiliar to you.
 * Test the MOS instance locally.
 * Deploy the MOS instance to a free AWS server.
 
-## Selecting and preparing a Dataset
+## Selecting and preparing a dataset
 The internet is rich with free data. However, for this project we want a
 minimally complex dataset that still meets our modeling needs. 
 
