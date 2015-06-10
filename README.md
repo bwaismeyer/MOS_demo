@@ -301,8 +301,283 @@ give you a "Run Application" button.
 If that fails, you can manually start the application via `shiny::runApp()` (
 see the help documentation for `runApp()` for details).
 
-## Deploying the MOS Instance to Amazon Web Services (AWS)
+## Deploying the MOS Instance to Amazon Web Services (AWS) Free Tier
+At this point, this document will walk through how to deploy to one of the
+servers available on Amazon's free service tier, specifically 
+[Amazon's EC2 service](http://aws.amazon.com/ec2/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=ec2_b&sc_content=ec2_e&sc_detail=amazon.ec2&sc_category=ec2&sc_segment=53611778562&sc_matchtype=e&sc_country=US&s_kwcid=AL!4422!3!53611778562!e!!g!!amazon.ec2&ef_id=VTlq7QAAAQOLjYDQ:20150511210335:s). 
 
+Using the EC2 service, we will deploy to a (free) micro instance of the EC2 
+Ubuntu AMI.
+
+### Creating a Free AWS Account
+First step, you need an AWS account. Sign up [here](http://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_hv_b&sc_content=aws_core_e&sc_detail=amazon%20web%20services&sc_category=cloud_computing&sc_segment=67361869722&sc_matchtype=e&sc_country=US&s_kwcid=AL!4422!3!67361869722!e!!g!!amazon%20web%20services&ef_id=VXdodwAABY2XTHKz:20150609222807:s).
+
+Follow the directions for either creating a new account or linking the free
+AWS to your current Amazon account.
+
+**Note**: This process does require a credit card and accessible phone, and the 
+free account is limited to a year and has use limits as well. Still, it should
+be more than sufficient for testing out MOS instances or deploying low-traffic
+instances.
+
+### Sign Into the Management Console
+You should be able to login [here](http://aws.amazon.com/console/).
+
+### Launching the Instance
+Once you've logged in, follow Amazon's 
+[instance launch instructions](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-launch-instance_linux.html), 
+noting the following: 
+
+* The guide assumes that you will use the Ubuntu Amazon Machine Image (AMI). If 
+you want to use a different AMI, please be prepared to figure out the correct 
+default user name and shell commands.
+* Accept the default security settings for the time being. We'll change those 
+during the next step.
+* Make sure you get the private key!
+
+### Authorize Inbound Traffic to the Instance
+We have an instance. Now we need to make sure we (and our users) can talk to it. 
+By default, AWS gives very broad access privileges. At least initially, this is 
+probably fine.
+
+Verify the server's inbound traffic rules by following 
+[these directions](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/authorizing-access-to-an-instance.html).
+
+If needed, update the selected security group to allow access via SSH 
+(universally or to your specific IP).
+
+### Setup Putty to Access the Instance
+Now that the instance is launched and open to SSH, we need to setup an SSH tool. 
+We'll use putty.
+
+Follow the directions for 
+[installing and configuring putty](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/putty.html).
+	
+**Note**: You can stop following the directions after you finish the "Starting 
+a Putty Session" section.
+
+### Setup a Swapfile
+Computing environments low in volatile memory (i.e., RAM) run the risk of easily 
+running out of working memory during memory intense operations - such as certain 
+R package installations and other operations. The micro instances are 
+low-memory computing environments.
+
+To counter this, we assign a special file the instance can use - a swapfile - 
+during periods when it runs out of RAM. 
+
+Login into the server via putty and then simply run this code (taken from [here](http://serverfault.com/questions/218750/why-dont-ec2-ubuntu-images-have-swap)) 
+in the putty console:
+```
+sudo dd if=/dev/zero of=/var/swapfile bs=1M count=2048 &&
+sudo chmod 600 /var/swapfile &&
+sudo mkswap /var/swapfile &&
+echo /var/swapfile none swap defaults 0 0 | sudo tee -a /etc/fstab &&
+sudo swapon -a
+```
+
+### Setup the R Mirror
+When we ask Ubuntu to install applications, it grabs files from certain default 
+repositories. The default R repository is usually badly out of date. We want to 
+specify one of the official CRAN repositories to insure we get the most up to 
+date version of R and packages.
+
+From the putty console, we're going to edit (and if needed create) an extra 
+depository-specification file:
+```
+sudo vi /etc/apt/sources.list.d/sources.list
+```
+
+Then we want to add this line to the file and save it.
+```
+deb http://cran.cs.wwu.edu/bin/linux/ubuntu trusty/
+```
+**Notes**
+
+* If you have any trouble using the vi editor, here's a 
+[good cheet sheet](http://www.lagmonster.org/docs/vi.html).
+* The selected CRAN mirror above is a Washington state mirror. If you want to 
+use an alternate mirror, here's the 
+[official CRAN mirror list](http://cran.r-project.org/mirrors.html).
+* The line points to the Ubuntu version Trusty repository. If you used a 
+different Amazon AMI than Ubuntu or if the version has changed from Trusty, 
+you will need to adjust the line accordingly.
+
+### Install and Configure R, Shiny, and Shiny Server
+Alright, it's time at last to get our core tools installed and configured. The 
+steps below are described in more detail 
+[here](https://github.com/chrisrzhou/RShiny-EC2Bootstrap#install-r).
+
+First we make sure all the server files are up to date.
+```
+sudo apt-get update
+sudo apt-get upgrade
+```
+
+Then we install base R and the R development tools.
+```
+sudo apt-get install r-base
+sudo apt-get install r-base-dev
+sudo apt-get install 
+```
+
+**Note**: You might get authentication warnings. Ignore these (say yes where 
+needed or ignore them where they're just messages) unless you know how to 
+properly setup the authentication process for R repository we're drawing our 
+files from.
+
+We give universal read/write permissions to the default R library pathway so 
+that installing/managing libraries is simplified
+```
+sudo chmod 777 /usr/local/lib/R/site-library
+```
+
+Do another quick update request before installing the packages to make sure the 
+R materials are up to date
+```
+sudo apt-get update
+```
+
+Now we install any R packages we need. Typically, this will just be "shiny" 
+(needed before installing Shiny Server) and "packrat" (if your project is using 
+"packrat" to manage its dependencies). From the console:
+```
+R
+install.packages("shiny")
+install.packages("packrat")
+q()
+```
+
+And now we install Shiny Server as described [here](http://www.rstudio.com/products/shiny/download-server/):
+```
+sudo apt-get install gdebi-core
+wget http://download3.rstudio.org/ubuntu-12.04/x86_64/shiny-server-1.3.0.403-amd64.deb
+sudo gdebi shiny-server-1.3.0.403-amd64.deb
+sudo rm shiny-server-1.3.0.403-amd64.deb
+```
+
+We configure Shiny Server to run under the appropriate user account (ubuntu) 
+and to look for our shiny apps in the right location (a subdirectory in the 
+ubuntu user directory).
+
+* Make the app-hosting folder and the logs folder (using whatever names you 
+like).
+```
+mkdir /home/ubuntu/shiny_apps
+mkdir /home/ubuntu/shiny_logs
+```
+* Adjust the shiny config file to (a) point to the appropriate directories and 
+(b) run under ubuntu. More information about the config file and its features is 
+available 
+[here](http://rstudio.github.io/shiny-server/latest/#default-configuration).
+```
+sudo vi /etc/shiny-server/shiny-server.conf
+```
+* Finally, it's time to return to the AWS EC2 security group and open up access
+to our Shiny Server port. Edit the instance security group Inbound rules and 
+add a custom TCP rule with the appropriate port number (e.g., 3838).
+
+### Install and Configure Git
+The best way to get our application(s) onto the EC2 server - and to setup an 
+efficient development-to-production pathway - is to use git and GitHub. This 
+guide assumes your applications are already hosted on GitHUb, so now you just 
+need to install git.
+```
+sudo apt-get install git
+```
+
+**Note**: If you've never used SSH with the relevant GitHub account before, you 
+might need to do 
+[some more setup](https://help.github.com/articles/generating-ssh-keys/) before 
+your git clone/pull requests will succeed.
+
+### Cloning the MOS Instance
+At this point, we have R, Shiny, and Shiny Server installed and configured to 
+play nicely with the default ubuntu account. We also have a pathway for pulling 
+up to date versions of our Shiny application(s) to our server.
+
+Now we need to clone our app(s) in our chosen app hosting folder (e.g., 
+```/home/ubuntu/shiny_apps```).
+
+Example bash commands for cloning an application:
+```
+cd /home/ubuntu/shiny_apps/
+git clone https://github.com/bwaismeyer/MOS_demo
+```
+
+### Setting Up Instance Dependencies
+Once you have cloned the repository for you MOS instance, you need to setup
+all the packages and other supporting files required for the instance to run.
+Setup directions for a particular instance may vary slightly if you have special 
+package requirements (e.g., if you modified the core framework files or needed 
+extra packages for your data loading).
+
+The MOS framework comes ready to use `packrat` to manage its R dependencies.
+All we need to do is clone the project and then start R in the COS application 
+directory. `packrat` will install all of the relevant packages from their 
+binaries (which `packrat` keeps copies of). 
+
+However, the `Cairo` package is special and attempts to install it will fail 
+unless the correct resources are added to our EC2 server.
+
+I THINK the only packages missing from the default EC2 setup are these.
+```
+sudo apt-get install libcairo2-dev
+sudo apt-get install libxt-dev
+```
+
+Now we initialize R in the MOS instance project folder - "packrat" should 
+automatically try to install all needed packages. Here's some more example
+code:
+```
+cd /home/ubuntu/shiny_apps/MOS_demo
+R
+```
+
+If "packrat" doesn't initialize:
+
+* First make sure the working directory is correct (```getwd()``` from the R 
+console).
+* Then manually force the update (```packrat::restore()``` from the R console).
+
+If packrat has installation errors, you'll need to problem shoot or install 
+those packages manually (e.g., ```install.packages()``` from the R console).
+
+**Exception**: If packrat is failing when it tries to download packages, check out 
+the workaround [here](https://github.com/rstudio/packrat/issues/209).
+
+### Initalize Shiny Server and Get the Link to Your App
+At this point, it's time to initialize Shiny Server and start looking at your 
+Shiny applications. From the putty console, simply use:
+```
+shiny-server
+```
+
+You should see some confirmation dialogue and see that the server is running. 
+
+**Note**: If you get EADDRINUSE errors... try changing the port Shiny is using 
+(e.g., to 3939). Don't forget that you need to add this port to the EC2 inbound 
+security group AND that this changes the link people need to use to reach the 
+app.
+
+The link you're looking for will be a combination of (a) the EC2 server's 
+Public DNS, (b) the Shiny Server port number, and (c) the application 
+subdirectory. It will look something like this:
+```
+[Public DNS]:[Port Number]/subdirectory
+```
+
+An example:
+```
+http://ec2-52-26-165-185.us-west-2.compute.amazonaws.com:3939/MOS_demo/
+```
+
+If the app of interest is in a sub-directory (most likely), then it may be 
+easiest to simply visit the base link (DNS:Port Number) and click through the 
+auto-generated index to get the full link to your app.
+
+### Admire Your Shiny Shiny App
+At this point you hopefully have an up-and-running MOS instance. Failing that,
+I hope your troubleshooting road is short and merry!
 
 ## Common Errors
 1. Subscript out of bounds, incorrect number of dimensions, etc.: This is
@@ -323,3 +598,9 @@ code that result from this overfitting.
 complex relative to your data. You should probably simplify your model, though
 you can also increase the number of allowed weights (e.g., multinom(..., 
 MaxNWts = 3000)).
+
+5. Can't find your AWS instance when you login to console: The instances are
+region specific. While logged into the AWS console, look in the upper right
+hand corner and check out what region you're logged into. Switch through the
+regions until you the region that is hosting your instance (or until you're
+confident it's not there at all).
