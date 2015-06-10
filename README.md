@@ -19,17 +19,17 @@ To create an MOS instance, you need three things:
 3. an `MOS_config.R` file tailored to the model, data, and your audience
 
 ## What is the point of this document and who is it written for?
-This documentat overviews the the process of going from data to a configured MOS 
+This document overviews the the process of going from data to a configured MOS 
 instance deployed on Amazon Web Services (AWS).
 
 The documentation was written for users who are (a) reasonably comfortable with 
 R and (b) reasonably comfortable with multinomial models. These users should
 (fingers crossed) be ready to produce their own MOS instances after 
-reviewing this project.
+reviewing this demo instance and documentation.
 
 More novice users may also have some success with setting up an MOS instance,
 though you should expect to do some supplemental learning on your own where
-R, Shiny, or multinomial statistics are unfamiliar to you.
+R, Shiny, or multinomial analysis are unfamiliar to you.
 
 ## Summary of key steps to constructing the demo MOS instance
 * Select a well formatted, publicly available dataset that will permit the
@@ -42,7 +42,7 @@ R, Shiny, or multinomial statistics are unfamiliar to you.
 * Test the MOS instance locally.
 * Deploy the MOS instance to a free AWS server.
 
-## Selecting and Preparing a Dataset
+## Selecting and preparing a Dataset
 The internet is rich with free data. However, for this project we want a
 minimally complex dataset that still meets our modeling needs. 
 
@@ -145,7 +145,7 @@ wine <- dplyr::select(wine, volatile.acidity, chlorides, density, alcohol,
                        type, quality_group)
 ```
 
-## Defining a Multinomial Model Formula
+## Defining a multinomial model formula
 The actual fitting of the multinomial model will occur when an MOS instance
 server is first initialized. (For users familiar with Shiny, the fitting
 occurs in the `server.R` file outside of the server loop.)
@@ -262,35 +262,35 @@ by editing the `ui.R` file directly (the MOS intance will use the
 Check out the demo [`MOS_config.R`](https://github.com/bwaismeyer/MOS_framework/blob/MOS_demo/MOS_config.R) 
 file to see an example of a fully specified config file.
 
-## Installing the Supporting Packages
+## Installing the supporting packages locally
 The MOS requires a family of supporting R packages. These are listed in the 
 `MOS_packages_and_custom_functions.R` script.
 
 You can either install the supporting R packages manually or (recommended) use
-[Packrat](https://rstudio.github.io/packrat/) to install the R packages from 
+[`packrat`](https://rstudio.github.io/packrat/) to install the R packages from 
 the provided binaries.
 
-Using Packrat and the provided binaries is recommended because (1) you will be
+Using `packrat` and the provided binaries is recommended because (1) you will be
 using versions of the packages that have been verified to work with the MOS, (2)
-Packrat is (usually) makes initial setup of MOS packages pretty painless, and
+`packrat` is (usually) makes initial setup of MOS packages pretty painless, and
 (3) Packtrat will make managing your MOS instance (and any new packages you 
 need for instance) easier.
 
-To use the Packrat approach:
+To use the `packrat` approach:
 
-1. Install Packrat manually - `install.packages("packrat")`.
+1. Install `packrat` manually - `install.packages("packrat")`.
 2. Switch your working directory to the MOS instance directory (e.g., 
 `setwd("./my_instance/")`).
-3. Initialize Packrat - `packrat::init()`.
+3. Initialize `packrat` - `packrat::init()`.
 
-Packrat should recognize the Packrat structure included with the base MOS
+`packrat` should recognize the `packrat` structure included with the base MOS
 framework and should attempt to install the included binaries.
 
 **Note**: You may have to do some extra legwork to install the supporting
 packages on various operating systems. See the AWS setup directions below or
 Google the error messages you observe.
 
-## Testing the MOS Instance Locally in R and RStudio
+## Testing the MOS instance locally in R and RStudio
 To test the application instance, simply open either the `server.R` or `ui.R`
 files in RStudio. 
 
@@ -301,7 +301,7 @@ give you a "Run Application" button.
 If that fails, you can manually start the application via `shiny::runApp()` (
 see the help documentation for `runApp()` for details).
 
-## Deploying the MOS Instance to Amazon Web Services (AWS) Free Tier
+## Deploying the MOS instance to Amazon Web Services (AWS) Free Tier
 At this point, this document will walk through how to deploy to one of the
 servers available on Amazon's free service tier, specifically 
 [Amazon's EC2 service](http://aws.amazon.com/ec2/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=ec2_b&sc_content=ec2_e&sc_detail=amazon.ec2&sc_category=ec2&sc_segment=53611778562&sc_matchtype=e&sc_country=US&s_kwcid=AL!4422!3!53611778562!e!!g!!amazon.ec2&ef_id=VTlq7QAAAQOLjYDQ:20150511210335:s). 
@@ -309,7 +309,7 @@ servers available on Amazon's free service tier, specifically
 Using the EC2 service, we will deploy to a (free) micro instance of the EC2 
 Ubuntu AMI.
 
-### Creating a Free AWS Account
+### Creating a free AWS account
 First step, you need an AWS account. Sign up [here](http://aws.amazon.com/free/?sc_channel=PS&sc_campaign=acquisition_US&sc_publisher=google&sc_medium=cloud_computing_hv_b&sc_content=aws_core_e&sc_detail=amazon%20web%20services&sc_category=cloud_computing&sc_segment=67361869722&sc_matchtype=e&sc_country=US&s_kwcid=AL!4422!3!67361869722!e!!g!!amazon%20web%20services&ef_id=VXdodwAABY2XTHKz:20150609222807:s).
 
 Follow the directions for either creating a new account or linking the free
@@ -320,10 +320,10 @@ free account is limited to a year and has use limits as well. Still, it should
 be more than sufficient for testing out MOS instances or deploying low-traffic
 instances.
 
-### Sign Into the Management Console
+### Sign into the Management Console
 You should be able to login [here](http://aws.amazon.com/console/).
 
-### Launching the Instance
+### Launching the AWS instance
 Once you've logged in, follow Amazon's 
 [instance launch instructions](http://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-launch-instance_linux.html), 
 noting the following: 
@@ -335,7 +335,7 @@ default user name and shell commands.
 during the next step.
 * Make sure you get the private key!
 
-### Authorize Inbound Traffic to the Instance
+### Authorize inbound traffic to the AWS instance
 We have an instance. Now we need to make sure we (and our users) can talk to it. 
 By default, AWS gives very broad access privileges. At least initially, this is 
 probably fine.
@@ -346,7 +346,7 @@ Verify the server's inbound traffic rules by following
 If needed, update the selected security group to allow access via SSH 
 (universally or to your specific IP).
 
-### Setup Putty to Access the Instance
+### Setup putty to access the AWS instance
 Now that the instance is launched and open to SSH, we need to setup an SSH tool. 
 We'll use putty.
 
@@ -356,7 +356,7 @@ Follow the directions for
 **Note**: You can stop following the directions after you finish the "Starting 
 a Putty Session" section.
 
-### Setup a Swapfile
+### Setup a swapfile
 Computing environments low in volatile memory (i.e., RAM) run the risk of easily 
 running out of working memory during memory intense operations - such as certain 
 R package installations and other operations. The micro instances are 
@@ -375,7 +375,7 @@ echo /var/swapfile none swap defaults 0 0 | sudo tee -a /etc/fstab &&
 sudo swapon -a
 ```
 
-### Setup the R Mirror
+### Setup the R mirror
 When we ask Ubuntu to install applications, it grabs files from certain default 
 repositories. The default R repository is usually badly out of date. We want to 
 specify one of the official CRAN repositories to insure we get the most up to 
@@ -402,7 +402,7 @@ use an alternate mirror, here's the
 different Amazon AMI than Ubuntu or if the version has changed from Trusty, 
 you will need to adjust the line accordingly.
 
-### Install and Configure R, Shiny, and Shiny Server
+### Install and configure R, Shiny, and Shiny Server
 Alright, it's time at last to get our core tools installed and configured. The 
 steps below are described in more detail 
 [here](https://github.com/chrisrzhou/RShiny-EC2Bootstrap#install-r).
@@ -438,8 +438,8 @@ sudo apt-get update
 ```
 
 Now we install any R packages we need. Typically, this will just be "shiny" 
-(needed before installing Shiny Server) and "packrat" (if your project is using 
-"packrat" to manage its dependencies). From the console:
+(needed before installing Shiny Server) and `packrat` (if your project is using 
+`packrat` to manage its dependencies). From the console:
 ```
 R
 install.packages("shiny")
@@ -476,7 +476,7 @@ sudo vi /etc/shiny-server/shiny-server.conf
 to our Shiny Server port. Edit the instance security group Inbound rules and 
 add a custom TCP rule with the appropriate port number (e.g., 3838).
 
-### Install and Configure Git
+### Install and configure Git
 The best way to get our application(s) onto the EC2 server - and to setup an 
 efficient development-to-production pathway - is to use git and GitHub. This 
 guide assumes your applications are already hosted on GitHUb, so now you just 
@@ -490,7 +490,7 @@ might need to do
 [some more setup](https://help.github.com/articles/generating-ssh-keys/) before 
 your git clone/pull requests will succeed.
 
-### Cloning the MOS Instance
+### Cloning the MOS instance
 At this point, we have R, Shiny, and Shiny Server installed and configured to 
 play nicely with the default ubuntu account. We also have a pathway for pulling 
 up to date versions of our Shiny application(s) to our server.
@@ -504,7 +504,7 @@ cd /home/ubuntu/shiny_apps/
 git clone https://github.com/bwaismeyer/MOS_demo
 ```
 
-### Setting Up Instance Dependencies
+### Setting Up MOS instance dependencies
 Once you have cloned the repository for you MOS instance, you need to setup
 all the packages and other supporting files required for the instance to run.
 Setup directions for a particular instance may vary slightly if you have special 
@@ -525,7 +525,7 @@ sudo apt-get install libcairo2-dev
 sudo apt-get install libxt-dev
 ```
 
-Now we initialize R in the MOS instance project folder - "packrat" should 
+Now we initialize R in the MOS instance project folder - `packrat` should 
 automatically try to install all needed packages. Here's some more example
 code:
 ```
@@ -533,19 +533,19 @@ cd /home/ubuntu/shiny_apps/MOS_demo
 R
 ```
 
-If "packrat" doesn't initialize:
+If `packrat` doesn't initialize:
 
 * First make sure the working directory is correct (```getwd()``` from the R 
 console).
 * Then manually force the update (```packrat::restore()``` from the R console).
 
-If packrat has installation errors, you'll need to problem shoot or install 
+If `packrat` has installation errors, you'll need to problem shoot or install 
 those packages manually (e.g., ```install.packages()``` from the R console).
 
-**Exception**: If packrat is failing when it tries to download packages, check out 
-the workaround [here](https://github.com/rstudio/packrat/issues/209).
+**Exception**: If `packrat` is failing when it tries to download packages, 
+check out the workaround [here](https://github.com/rstudio/packrat/issues/209).
 
-### Initalize Shiny Server and Get the Link to Your App
+### Initalize Shiny Server and get the link to your deployed MOS instance
 At this point, it's time to initialize Shiny Server and start looking at your 
 Shiny applications. From the putty console, simply use:
 ```
@@ -575,7 +575,7 @@ If the app of interest is in a sub-directory (most likely), then it may be
 easiest to simply visit the base link (DNS:Port Number) and click through the 
 auto-generated index to get the full link to your app.
 
-### Admire Your Shiny Shiny App
+### Admire your MOS instance
 At this point you hopefully have an up-and-running MOS instance. Failing that,
 I hope your troubleshooting road is short and merry!
 
